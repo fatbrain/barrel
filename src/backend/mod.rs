@@ -84,6 +84,9 @@ pub trait SqlGenerator {
     /// Create a multi-column index
     fn create_index(table: &str, schema: Option<&str>, name: &str, _type: &Type) -> String;
 
+    /// Create a multi-column index, only if it doesn't exist
+    fn create_index_if_not_exists(table: &str, schema: Option<&str>, name: &str, _type: &Type) -> String;
+
     /// Drop a multi-column index
     fn drop_index(name: &str) -> String;
 }

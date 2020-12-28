@@ -168,6 +168,12 @@ pub enum IndexChange {
         columns: types::Type, // Should always be a `Index` type
     },
 
+    AddIndexIfNotExists {
+        index: String,
+        table: String,
+        columns: types::Type,
+    },
+
     /// Remove a multi-column index
     RemoveIndex(String, String),
 }

@@ -87,6 +87,21 @@ impl Table {
         });
     }
 
+    pub fn add_index_if_not_exists<S: Into<String>>(&mut self, name: S, columns: Type) {
+        match columns.inner {
+            crate::types::BaseType::Index(_) => {}
+            _ => {
+                panic!("Calling `add_index_if_not_exists` with a non-`Index` type is not allowed!")
+            }
+        }
+
+        self.indices.push(IndexChange::AddIndexIfNotExists {
+            table: self.meta.name.clone(),
+            index: name.into(),
+            columns,
+        });
+    }
+
     /// Drop an index on this table
     pub fn drop_index<S: Into<String>>(&mut self, name: S) {
         self.indices.push(IndexChange::RemoveIndex(
@@ -131,6 +146,11 @@ impl Table {
                     table,
                     columns,
                 } => T::create_index(table, schema, index, columns),
+                IC::AddIndexIfNotExists {
+                    index,
+                    table,
+                    columns,
+                } => T::create_index_if_not_exists(table, schema, index, columns),
                 IC::RemoveIndex(_, index) => T::drop_index(index),
             })
             .collect();

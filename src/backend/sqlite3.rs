@@ -107,6 +107,28 @@ impl SqlGenerator for Sqlite {
         )
     }
 
+    /// Create a multi-column index
+    fn create_index_if_not_exists(table: &str, schema: Option<&str>, name: &str, _type: &Type) -> String {
+        format!(
+            "CREATE {} INDEX IF NOT EXISTS {}\"{}\" ON \"{}\" ({});",
+            match _type.unique {
+                true => "UNIQUE",
+                false => "",
+            },
+            prefix!(schema),
+            name,
+            table,
+            match _type.inner {
+                BaseType::Index(ref cols) => cols
+                    .iter()
+                    .map(|col| format!("\"{}\"", col))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                _ => unreachable!(),
+            }
+        )
+    }
+
     /// Drop a multi-column index
     fn drop_index(name: &str) -> String {
         format!("DROP INDEX \"{}\"", name)
